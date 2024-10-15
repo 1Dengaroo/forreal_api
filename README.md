@@ -1,24 +1,40 @@
-# README
+# forREAL technical assessment
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Dependencies
 
-Things you may want to cover:
+- Ruby: ruby-3.1.2
+- SQLite
 
-* Ruby version
+## Regular Setup
 
-* System dependencies
+Make sure you're using the correct Ruby version (check the Gemfile for that)
 
-* Configuration
+Install dependencies using bundler:
 
-* Database creation
+```
+bundle install
+```
 
-* Database initialization
+Setup your database:
 
-* How to run the test suite
+```
+bundle exec rails db:create db:migrate
+```
 
-* Services (job queues, cache servers, search engines, etc.)
+## Testing
 
-* Deployment instructions
+```
+bundle exec rspec
+```
 
-* ...
+## Lint
+
+```
+bundle exec rubocop
+```
+
+## Seed the Database
+
+```
+bundle exec rails db:seed
+```

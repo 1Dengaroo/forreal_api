@@ -9,64 +9,67 @@ RSpec.describe ImagesService::ReorderImages, type: :service do
   let!(:image3) { create(:image, property: property, position: 2) }
 
   describe '#call' do
-    context 'when image_ids is empty' do
+    context 'when image_positions is empty' do
       it 'returns an error message' do
         service = described_class.new(property, [])
         result = service.call
 
         expect(result[:success]).to be_falsey
-        expect(result[:message]).to eq('image_ids cannot be empty')
+        expect(result[:message]).to eq('image_positions cannot be empty')
         expect(result[:status]).to eq(:bad_request)
       end
     end
 
-    context 'when the number of image_ids does not match the number of property images' do
-      it 'returns an error for mismatched image count' do
-        service = described_class.new(property, [image1.id])
+    context 'when image_positions is not a permutation of valid indices' do
+      it 'returns an error for invalid positions' do
+        service = described_class.new(property, [0, 1])
         result = service.call
 
         expect(result[:success]).to be_falsey
-        expect(result[:message]).to eq('You must provide exactly 3 image IDs')
+        expect(result[:message]).to eq('image_positions must be a permutation of [0, 1, 2]')
+        expect(result[:status]).to eq(:unprocessable_entity)
+      end
+
+      it 'returns an error for duplicate indices' do
+        service = described_class.new(property, [0, 1, 1])
+        result = service.call
+
+        expect(result[:success]).to be_falsey
+        expect(result[:message]).to eq('image_positions must be a permutation of [0, 1, 2]')
+        expect(result[:status]).to eq(:unprocessable_entity)
+      end
+
+      it 'returns an error for indices out of range' do
+        service = described_class.new(property, [0, 1, 3])
+        result = service.call
+
+        expect(result[:success]).to be_falsey
+        expect(result[:message]).to eq('image_positions must be a permutation of [0, 1, 2]')
         expect(result[:status]).to eq(:unprocessable_entity)
       end
     end
 
-    context 'when the image_ids do not match the property image set' do
-      it 'returns an error for mismatched image IDs' do
-        other_image = create(:image) # Image not belonging to the property
-        service = described_class.new(property, [image1.id, image2.id, other_image.id])
-        result = service.call
-
-        expect(result[:success]).to be_falsey
-        expect(result[:message]).to eq("Image IDs do not match the property's image set")
-        expect(result[:status]).to eq(:unprocessable_entity)
-      end
-    end
-
-    context 'when there are duplicate image_ids' do
-      it 'returns an error for duplicate image IDs' do
-        service = described_class.new(property, [image1.id, image1.id, image2.id])
-        result = service.call
-
-        expect(result[:success]).to be_falsey
-        expect(result[:message]).to eq('Duplicate image IDs are not allowed')
-        expect(result[:status]).to eq(:unprocessable_entity)
-      end
-    end
-
-    context 'when the image_ids are valid' do
+    context 'when image_positions are valid' do
       it 'reorders the images successfully' do
-        service = described_class.new(property, [image2.id, image3.id, image1.id])
+        # Suppose we want to move:
+        # - Image at current index 2 to new position 0
+        # - Image at current index 0 to new position 1
+        # - Image at current index 1 to new position 2
+        # So, image_positions = [2, 0, 1]
+        service = described_class.new(property, [2, 0, 1])
         result = service.call
 
         expect(result[:success]).to be_truthy
         expect(result[:message]).to eq('Order updated successfully')
         expect(result[:status]).to eq(:ok)
 
-        # Ensure the images are reordered properly
-        expect(image2.reload.position).to eq(0)
-        expect(image3.reload.position).to eq(1)
-        expect(image1.reload.position).to eq(2)
+        # After reordering:
+        # - image3 (index 2) should be at position 0
+        # - image1 (index 0) should be at position 1
+        # - image2 (index 1) should be at position 2
+        expect(image3.reload.position).to eq(0)
+        expect(image1.reload.position).to eq(1)
+        expect(image2.reload.position).to eq(2)
       end
     end
   end
