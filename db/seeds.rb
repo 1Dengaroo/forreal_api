@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# Clear existing data (optional, useful for reseeding)
 Property.destroy_all
 Image.destroy_all
 

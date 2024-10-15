@@ -1,5 +1,9 @@
 # forREAL Technical Assessment - Andy Deng
 
+## Video Demonstration
+
+https://www.dropbox.com/scl/fi/t0p76allvkna6wmp68ppz/Screen-Recording-2024-10-15-at-4.17.15-PM.mov?rlkey=zh30sidxkh172b6qvd20cdn01&st=t1bdnvkm&dl=0
+
 ## Dependencies
 
 - Ruby: ruby-3.1.2
@@ -99,13 +103,13 @@ bundle exec rails db:seed
 - **Description**: Updates the order of images for the property specified by `:id`.
 - **Request Body**: A JSON object containing an array `image_positions`, which specifies the new order of images.
 
-**Example Request Body**:
+**Example Request**:
 
 ```json
 Content-Type: application/json
 
 {
-  "image_positions": [4, 3, 2, 1, 0]
+  "image_positions": [4, 3, 2, 1, 0]    # reverse the current order
 }
 ```
 
