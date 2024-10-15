@@ -40,7 +40,7 @@ jobs:
         run: bundle install
 
       - name: Lint code for consistent style using RuboCop
-        run: bundle exec rubocop
+        run: rubocop
 
   test:
     runs-on: ubuntu-latest
