@@ -7,7 +7,7 @@ class PropertiesController < ApplicationController
   end
 
   def show
-    property = Property.find(params[:id])
+    property = Property.find_by(id: params[:id])
     render json: property
   end
 end

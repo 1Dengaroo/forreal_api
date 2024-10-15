@@ -3,9 +3,7 @@
 Rails.application.routes.draw do
   resources :properties, only: %i[index show] do
     resources :images, only: [:index] do
-      collection do
-        patch 'reorder'
-      end
+      put :update_order, on: :collection
     end
   end
 end

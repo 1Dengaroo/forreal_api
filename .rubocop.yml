@@ -64,6 +64,9 @@ RSpec/MultipleExpectations:
 RSpec/LetSetup:
   Enabled: false
 
+RSpec/IndexedLet:
+  Enabled: false
+
 RSpec/MultipleSubjects:
   Enabled: false
 

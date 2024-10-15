@@ -5,27 +5,24 @@ class ImagesController < ApplicationController
 
   def index
     images = @property.images
-    render json: images
+    render json: images.as_json(only: %i[image_url position])
   end
 
-  def reorder
-    image_ids = params.require(:image_ids)
-    ActiveRecord::Base.transaction do
-      image_ids.each_with_index do |id, index|
-        image = @property.images.find(id)
-        image.update!(position: index)
-      end
-    end
-    render json: { status: 'ok' }
-  rescue ActiveRecord::RecordNotFound => e
-    render json: { error: e.message }, status: :not_found
-  rescue ActiveRecord::RecordInvalid => e
-    render json: { error: e.message }, status: :unprocessable_entity
+  def update_order
+    image_ids = reorder_params[:image_ids]
+    service = ImagesService::ReorderImages.new(@property, image_ids)
+    result = service.call
+
+    render json: { message: result[:message] }, status: result[:status]
   end
 
   private
 
   def set_property
     @property = Property.find(params[:property_id])
+  end
+
+  def reorder_params
+    params.permit(image_ids: [])
   end
 end
